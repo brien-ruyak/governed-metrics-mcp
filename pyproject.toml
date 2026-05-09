@@ -1,0 +1,28 @@
+[project]
+name = "governed-metrics-mcp"
+version = "0.1.0"
+description = "An MCP server demonstrating the governed metrics layer pattern: an LLM accesses curated metric definitions as tools instead of writing raw SQL against a database."
+readme = "README.md"
+authors = [
+    { name = "Brien Ruyak", email = "12535280+brien-ruyak@users.noreply.github.com" }
+]
+requires-python = ">=3.11"
+dependencies = [
+    "duckdb>=1.5.2",
+    "faker>=40.15.0",
+    "mcp>=1.27.1",
+    "pydantic>=2.13.4",
+    "pyyaml>=6.0.3",
+]
+
+[project.scripts]
+governed-metrics-mcp = "governed_metrics_mcp:main"
+
+[build-system]
+requires = ["uv_build>=0.11.11,<0.12.0"]
+build-backend = "uv_build"
+
+[dependency-groups]
+dev = [
+    "pytest>=9.0.3",
+]

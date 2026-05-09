@@ -1,0 +1,6 @@
+# Auto-detect text files, normalize line endings to LF in the repo
+* text=auto eol=lf
+
+# Explicit binary types (git won't try to convert these)
+*.duckdb binary
+*.png binary
