@@ -1,0 +1,50 @@
+name: order_volume.yaml
+description: >-
+  Count of orders over a time window, optionally filtered by region,
+  sales channel, or order status. Use this metric to answer questions
+  like "How many orders did we get last month?" or "What's our order
+  volume in the West region for Q1?"
+
+parameters:
+  - name: start_date
+    type: date
+    description: Start of the time window (YYYY-MM-DD). Defaults to 90 days ago.
+    required: false
+
+  - name: end_date
+    type: date
+    description: End of the time window (YYYY-MM-DD). Defaults to today.
+    required: false
+
+  - name: region
+    type: str
+    description: "Filter by customer region. Valid values: West, East, Central, South."
+    required: false
+    enum: [West, East, Central, South]
+
+  - name: channel
+    type: str
+    description: "Filter by sales channel. Valid values: web, mobile, marketplace."
+    required: false
+    enum: [web, mobile, marketplace]
+
+  - name: status
+    type: str
+    description: "Filter by order status. Defaults to completed."
+    required: false
+    default: completed
+    enum: [completed, cancelled]
+
+sql_base: >-
+  SELECT COUNT(*) AS order_count
+  FROM orders
+  WHERE order_date >= $start_date
+    AND order_date <= $end_date
+
+sql_filters:
+  region: "AND region = $region"
+  channel: "AND channel = $channel"
+  status: "AND status = $status"
+
+output_columns:
+  - order_count
