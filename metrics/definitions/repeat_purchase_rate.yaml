@@ -1,0 +1,61 @@
+name: repeat_purchase_rate.yaml
+description: >-
+  Percentage of customers whose first completed order falls in the given
+  cohort month who then place a second completed order within N days.
+  Use this metric to answer questions like "What's the repeat purchase
+  rate for customers who first bought in March?" or "How does our 60-day
+  repeat rate look for the January cohort?"
+
+parameters:
+  - name: cohort_month
+    type: str
+    description: >-
+      Month of first purchase defining the cohort, formatted as YYYY-MM
+      (e.g., "2025-06"). Required — there is no sensible default cohort.
+    required: true
+
+  - name: repeat_window_days
+    type: int
+    description: >-
+      Number of days after first purchase to look for a second order.
+      Defaults to 90.
+    required: false
+    default: 90
+
+sql_base: >-
+  WITH first_orders AS (
+    SELECT customer_id, MIN(order_date) AS first_order_date
+    FROM orders
+    WHERE status = 'completed'
+    GROUP BY customer_id
+  ),
+  cohort AS (
+    SELECT customer_id, first_order_date
+    FROM first_orders
+    WHERE strftime(first_order_date, '%Y-%m') = $cohort_month
+  ),
+  repeats AS (
+    SELECT DISTINCT c.customer_id
+    FROM cohort c
+    JOIN orders o ON c.customer_id = o.customer_id
+    WHERE o.status = 'completed'
+      AND o.order_date > c.first_order_date
+      AND o.order_date <= c.first_order_date + INTERVAL ($repeat_window_days) DAY
+  )
+  SELECT
+    ROUND(
+      COUNT(DISTINCT repeats.customer_id) * 100.0
+        / NULLIF((SELECT COUNT(*) FROM cohort), 0),
+      2
+    ) AS repeat_rate,
+    (SELECT COUNT(*) FROM cohort) AS cohort_size,
+    COUNT(DISTINCT repeats.customer_id) AS repeat_customers
+  FROM cohort
+  LEFT JOIN repeats ON cohort.customer_id = repeats.customer_id
+
+sql_filters: {}
+
+output_columns:
+  - repeat_rate
+  - cohort_size
+  - repeat_customers

@@ -73,6 +73,11 @@ class MetricDefinition(BaseModel):
         default_factory=dict,
         description="Optional filter clauses: param_name → 'AND column = $param_name'",
     )
+    sql_suffix: str | None = Field(
+        default=None,
+        description="Optional SQL appended after filters — GROUP BY, ORDER BY, LIMIT. "
+        "Can contain $param placeholders for bound values (e.g., LIMIT $limit).",
+    )
     output_columns: list[str] = Field(
         description="Column names in the query result, in order"
     )

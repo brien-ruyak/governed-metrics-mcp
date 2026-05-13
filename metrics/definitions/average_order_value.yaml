@@ -1,0 +1,53 @@
+name: average_order_value.yaml
+description: >-
+  Average order value (AOV) over a time window, optionally segmented by
+  customer segment, region, or sales channel. Use this metric to answer
+  questions like "What's our AOV this quarter?" or "How does average order
+  value compare between VIP and new customers?"
+
+parameters:
+  - name: start_date
+    type: date
+    description: Start of the time window (YYYY-MM-DD). Defaults to 90 days ago.
+    required: false
+
+  - name: end_date
+    type: date
+    description: End of the time window (YYYY-MM-DD). Defaults to today.
+    required: false
+
+  - name: region
+    type: str
+    description: "Filter by customer region. Valid values: West, East, Central, South."
+    required: false
+    enum: [West, East, Central, South]
+
+  - name: channel
+    type: str
+    description: "Filter by sales channel. Valid values: web, mobile, marketplace."
+    required: false
+    enum: [web, mobile, marketplace]
+
+  - name: segment
+    type: str
+    description: "Filter by customer segment. Valid values: new, returning, VIP."
+    required: false
+    enum: [new, returning, VIP]
+
+sql_base: >-
+  SELECT ROUND(AVG(o.total_amount), 2) AS avg_order_value,
+         COUNT(*) AS order_count
+  FROM orders o
+  JOIN customers c ON o.customer_id = c.customer_id
+  WHERE o.order_date >= $start_date
+    AND o.order_date <= $end_date
+    AND o.status = 'completed'
+
+sql_filters:
+  region: "AND o.region = $region"
+  channel: "AND o.channel = $channel"
+  segment: "AND c.segment = $segment"
+
+output_columns:
+  - avg_order_value
+  - order_count

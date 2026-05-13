@@ -1,0 +1,56 @@
+name: top_products_by_revenue.yaml
+description: >-
+  Top products ranked by total revenue, with optional filters for time
+  window, product category, and result count. Use this metric to answer
+  questions like "What are our top 10 products by revenue?" or "Which
+  electronics products generated the most revenue last quarter?"
+
+parameters:
+  - name: start_date
+    type: date
+    description: Start of the time window (YYYY-MM-DD). Defaults to 90 days ago.
+    required: false
+
+  - name: end_date
+    type: date
+    description: End of the time window (YYYY-MM-DD). Defaults to today.
+    required: false
+
+  - name: category
+    type: str
+    description: "Filter by product category. Valid values: apparel, electronics, home, beauty, sports."
+    required: false
+    enum: [apparel, electronics, home, beauty, sports]
+
+  - name: limit
+    type: int
+    description: Maximum number of products to return. Defaults to 10.
+    required: false
+    default: 10
+
+sql_base: >-
+  SELECT
+    p.name AS product_name,
+    p.category,
+    SUM(oi.quantity * oi.unit_price) AS revenue,
+    SUM(oi.quantity) AS units_sold
+  FROM order_items oi
+  JOIN orders o ON oi.order_id = o.order_id
+  JOIN products p ON oi.product_id = p.product_id
+  WHERE o.order_date >= $start_date
+    AND o.order_date <= $end_date
+    AND o.status = 'completed'
+
+sql_filters:
+  category: "AND p.category = $category"
+
+sql_suffix: >-
+  GROUP BY p.name, p.category
+  ORDER BY revenue DESC
+  LIMIT $limit
+
+output_columns:
+  - product_name
+  - category
+  - revenue
+  - units_sold

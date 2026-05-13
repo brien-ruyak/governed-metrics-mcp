@@ -210,4 +210,9 @@ class MetricExecutor:
             bind_params[pdef.name] = value
 
         sql = "\n  ".join(parts)
+
+        # Append suffix (GROUP BY, ORDER BY, LIMIT) if defined
+        if metric.sql_suffix:
+            sql = sql + "\n  " + metric.sql_suffix.strip()
+
         return sql, bind_params
