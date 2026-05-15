@@ -2,7 +2,7 @@
 
 An MCP server that gives LLMs access to **governed metric definitions** instead of raw SQL. The LLM picks the right metric, passes typed parameters, and gets validated results — it never sees a table schema or writes a query.
 
-<!-- [![CI](https://github.com/brien-ruyak/governed-metrics-mcp/actions/workflows/ci.yml/badge.svg)](https://github.com/brien-ruyak/governed-metrics-mcp/actions/workflows/ci.yml) -->
+ [![CI](https://github.com/brien-ruyak/governed-metrics-mcp/actions/workflows/ci.yml/badge.svg)](https://github.com/brien-ruyak/governed-metrics-mcp/actions/workflows/ci.yml) 
 
 ## The Problem
 
@@ -98,7 +98,7 @@ Full architecture diagram: [docs/architecture.md](docs/architecture.md)
 
 ## Adding a New Metric
 
-Adding a metric means adding a YAML file — no Python code changes. See [metrics/README.md](metrics/metrics_README) for the step-by-step walkthrough.
+Adding a metric means adding a YAML file — no Python code changes. See [metrics/README.md](metrics/README) for the step-by-step walkthrough.
 
 ## Tech Stack
 
