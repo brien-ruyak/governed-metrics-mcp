@@ -149,6 +149,29 @@ The practical payoff: metric consistency without sacrificing natural-language ac
 
 This demo uses a synthetic e-commerce dataset and DuckDB. The pattern applies to any domain and any database. The governance boundary — YAML definitions validated by Pydantic, exposed as typed MCP tools — is the part that transfers.
 
+## What's Next
+
+Two natural extensions of the governed metrics pattern worth exploring:
+
+**Autonomous analysis agent** — instead of a human prompting the metrics server,
+a scheduled agent runs a predefined analysis suite on a cadence. Every Monday
+morning it pulls order volume, AOV, repeat purchase rate, and return rate for
+the prior week, compares each to the previous period, flags anomalies against
+configurable thresholds, and delivers a structured summary — no analyst required
+to kick it off. The governed metrics layer makes this safe: the agent can only
+call validated metric tools, so scheduled runs produce consistent, trustworthy
+output rather than ad-hoc queries that drift over time.
+
+**Exploratory mode with unvalidated labeling** — power users sometimes need to
+go beyond the governed metric set to answer questions the YAML definitions don't
+cover yet. An exploratory tool could allow more flexible querying against the
+same read-only database, but tag every result as `unvalidated` in the response
+metadata. This preserves the governance contract for core metrics while giving
+analysts an escape hatch — the tradeoff between flexibility and trust is made
+explicit rather than hidden. Results marked unvalidated can inform a decision
+but should trigger a follow-up: if the answer matters, define it as a governed
+metric and version-control it.
+
 ## License
 
 MIT — see [LICENSE](LICENSE)
