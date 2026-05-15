@@ -4,7 +4,7 @@ An MCP server that gives LLMs access to **governed metric definitions** instead 
 
  [![CI](https://github.com/brien-ruyak/governed-metrics-mcp/actions/workflows/ci.yml/badge.svg)](https://github.com/brien-ruyak/governed-metrics-mcp/actions/workflows/ci.yml) 
 
-![QoQ Performance Dashboard](docs/screenshots/Screenshot_2026-05-14_212432.png)
+![QoQ Performance Dashboard](docs/screenshots/dashboard_qoq.png)
 
 ## The Problem
 
