@@ -29,9 +29,6 @@ The deeper problem is structural: **there's no layer between the question and th
 
 ## The Pattern
 
-Define each business metric once in YAML — its name, description, typed parameters, and SQL template. Expose each as an MCP tool. The LLM picks the right tool from the description, passes validated parameters, and gets structured results. It never touches SQL.
-## The Pattern
-
 The governed metrics layer is the missing layer between the question and the database.
 
 Each business metric is defined once in YAML: its name, a description written for an LLM audience, the business logic encoded as a SQL template, the join relationships needed to compute it correctly, and typed parameters with validation constraints. That definition is the contract — version-controlled, tested, and shared across every consumer.
@@ -43,7 +40,7 @@ This directly addresses each failure mode:
 3. **A hard governance boundary** — the LLM can only call governed metric tools. It cannot construct arbitrary queries, access tables outside the metrics layer, or bypass parameter validation. The boundary is enforced structurally, not by prompt.
 4. **Self-service without SQL knowledge** — the business logic and join relationships are encoded in the metric definition. A non-analyst asks a question in plain English; the LLM selects the right metric, passes the right parameters, and gets a correct answer — without knowing a foreign key exists.
 
-The metrics layer is dynamic, not a rigid pre-built dashboard. It answers the questions people actually ask, not just the ones someone anticipated. The pattern is what dbt metrics, Cube, and MetricFlow implement for BI tools. MCP makes it
+The metrics layer is dynamic, not a rigid pre-built dashboard. It answers the questions people actually ask, not just the ones someone anticipated. The pattern is what dbt metrics, Cube, and MetricFlow implement for BI tools. MCP makes it work for conversational AI.
 
 ```
 Business question → LLM selects tool → MCP server validates params → DuckDB executes governed SQL → Structured result
