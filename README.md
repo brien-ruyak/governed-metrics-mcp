@@ -1,6 +1,10 @@
 # Governed Metrics MCP
 
-An MCP server that gives LLMs access to **governed metric definitions** instead of raw SQL. The LLM picks the right metric, passes typed parameters, and gets validated results — it never sees a table schema or writes a query.
+An MCP server that solves the analyst bottleneck without sacrificing governance.
+Business users ask questions in plain English. The LLM calls governed metric
+definitions — not raw SQL — so every answer comes from the same tested,
+version-controlled business logic. **No hallucinated columns. No inconsistent
+metrics. No SQL knowledge required.**
 
  [![CI](https://github.com/brien-ruyak/governed-metrics-mcp/actions/workflows/ci.yml/badge.svg)](https://github.com/brien-ruyak/governed-metrics-mcp/actions/workflows/ci.yml) 
 
@@ -8,15 +12,38 @@ An MCP server that gives LLMs access to **governed metric definitions** instead 
 
 ## The Problem
 
-When you connect an LLM to a database and let it write SQL, three things go wrong:
+Analytics teams have two persistent problems that no amount of tooling has fully solved.
 
-1. **Hallucinated columns** — the LLM guesses at column names it hasn't seen, producing queries that fail or silently return wrong results.
-2. **Inconsistent metric logic** — "revenue" means one thing in the morning and another after lunch, because every query reinvents the calculation.
-3. **No guardrails** — the LLM can query anything, join anything, and return anything. There's no governance boundary between "questions the business wants answered" and "arbitrary SQL the model can generate."
+The first is the **analyst bottleneck**. Business users can't self-serve on data questions — they either wait for an analyst to write a query, or they make decisions on gut feel. The bottleneck isn't access to data; it's access to correct, trusted data. Dashboards help, but they only answer the questions someone thought to ask in advance.
+
+The second is **metric fragmentation**. Ask three analysts what "return rate" means and you get three different SQL queries. Different date filters, different join logic, different handling of cancelled orders. The disagreement surfaces in board meetings, not before them. Every team ends up with their own version of the truth, and reconciling them is expensive and political.
+
+The instinct to solve this with LLMs — "just let the model write SQL" — makes both problems worse. Four things break immediately:
+
+1. **Hallucinated columns** — the model guesses at column names it hasn't seen, producing queries that fail outright or silently return wrong results. There's no way to know which without checking the SQL yourself.
+2. **Inconsistent metric logic** — "revenue" means one thing in the morning and another after lunch, because every query reinvents the calculation. An LLM doing this just gets inconsistent numbers faster.
+3. **No guardrails** — the model can query anything, join anything, and return anything. There's no governance boundary between "questions the business wants answered" and "arbitrary SQL the model can generate." One bad query against a production database is all it takes.
+4. **No data model, no self-service** — business users aren't SQL analysts. Even with direct database access, they can't navigate join relationships, understand foreign keys, or know which tables to trust. Without a layer that encodes that knowledge for them, self-service analytics remains a promise that never ships.
+
+The deeper problem is structural: **there's no layer between the question and the database that encodes what the business actually means**. Without that layer, every query — human or LLM-generated — starts from scratch, and non-analysts are permanently locked out.
 
 ## The Pattern
 
 Define each business metric once in YAML — its name, description, typed parameters, and SQL template. Expose each as an MCP tool. The LLM picks the right tool from the description, passes validated parameters, and gets structured results. It never touches SQL.
+## The Pattern
+
+The governed metrics layer is the missing layer between the question and the database.
+
+Each business metric is defined once in YAML: its name, a description written for an LLM audience, the business logic encoded as a SQL template, the join relationships needed to compute it correctly, and typed parameters with validation constraints. That definition is the contract — version-controlled, tested, and shared across every consumer.
+
+This directly addresses each failure mode:
+
+1. **No hallucinated columns** — the LLM never sees the schema. It sees metric tool definitions and calls them with validated parameters. The SQL is generated from the YAML, not invented by the model.
+2. **Consistent metric logic** — "return rate" is defined once. Every question that touches return rate uses the same calculation, the same filters, the same join logic. No drift, no reconciliation meetings.
+3. **A hard governance boundary** — the LLM can only call governed metric tools. It cannot construct arbitrary queries, access tables outside the metrics layer, or bypass parameter validation. The boundary is enforced structurally, not by prompt.
+4. **Self-service without SQL knowledge** — the business logic and join relationships are encoded in the metric definition. A non-analyst asks a question in plain English; the LLM selects the right metric, passes the right parameters, and gets a correct answer — without knowing a foreign key exists.
+
+The metrics layer is dynamic, not a rigid pre-built dashboard. It answers the questions people actually ask, not just the ones someone anticipated. The pattern is what dbt metrics, Cube, and MetricFlow implement for BI tools. MCP makes it
 
 ```
 Business question → LLM selects tool → MCP server validates params → DuckDB executes governed SQL → Structured result
