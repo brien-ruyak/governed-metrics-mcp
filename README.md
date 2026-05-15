@@ -98,7 +98,7 @@ Full architecture diagram: [docs/architecture.md](docs/architecture.md)
 
 ## Adding a New Metric
 
-Adding a metric means adding a YAML file — no Python code changes. See [metrics/README.md](metrics/README) for the step-by-step walkthrough.
+Adding a metric means adding a YAML file — no Python code changes. See [metrics/README.md](metrics/README.md) for the step-by-step walkthrough.
 
 ## Tech Stack
 
