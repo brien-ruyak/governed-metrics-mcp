@@ -1,0 +1,13 @@
+{
+  "mcpServers": {
+    "governed-metrics": {
+      "command": "uv",
+      "args": [
+        "run",
+        "--directory",
+        "/ABSOLUTE/PATH/TO/governed-metrics-mcp",
+        "governed-metrics-mcp"
+      ]
+    }
+  }
+}

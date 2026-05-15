@@ -1,2 +1,3 @@
-def main() -> None:
-    print("Hello from governed-metrics-mcp!")
+from governed_metrics_mcp.server import main
+
+__all__ = ["main"]

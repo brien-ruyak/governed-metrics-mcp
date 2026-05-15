@@ -128,7 +128,7 @@ def create_server(
     # Register each metric as an MCP tool
     for metric_def in registry.all_definitions():
         handler, description = _make_tool_handler(metric_def, executor)
-        server.add_tool(handler, name=metric_def.name, description=description)
+        server.add_tool(handler, name=metric_def.name.removesuffix(".yaml"), description=description)
         logger.info(f"Registered tool: {metric_def.name}")
 
     logger.info(
